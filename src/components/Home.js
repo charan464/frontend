@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Navbar from './Navbar'
 import './Home.css'
 import { Card,Button ,Form,FormText, Toast} from 'react-bootstrap'
@@ -6,8 +6,14 @@ import { useState,useRef } from 'react'
 import {toast,ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import emailjs from '@emailjs/browser';
+import user from './Login'
+import { useNavigate } from 'react-router-dom';
+import {fetchUserData} from './api/Authentication'
+import axios from 'axios'
 
-function Home() {
+function Home(props) {
+
+  const navigate= useNavigate();
 
   const form = useRef();
 
@@ -17,6 +23,48 @@ function Home() {
   const [email,setEmail]=useState("");
 
 
+    
+
+    function passwordGenerator()
+    {
+        var ualp="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var lalp="abcdefghijklmnopqrstuvwxyz";
+        var dig="0123456789";
+        var sp="!@^";
+
+        var password=""
+
+        for(let i=0;i<2;i++)
+        {
+            password=password+ualp.charAt(Math.floor(Math.random()*26));
+        }
+
+        for(let i=0;i<3;i++)
+        {
+            password=password+lalp.charAt(Math.floor(Math.random()*26));
+        }
+
+        for(let i=0;i<1;i++)
+        {
+            password=password+sp.charAt(Math.floor(Math.random()*7));
+        }
+
+        for(let i=0;i<4;i++)
+        {
+            password=password+dig.charAt(Math.floor(Math.random()*10));
+        }
+
+          document.getElementById("password").value=password;
+
+
+          return password;
+
+    }
+
+
+
+
+  
 
   const sendEmail=(e)=>{
     e.preventDefault();
@@ -28,14 +76,30 @@ function Home() {
 
           else{
 
-    emailjs.sendForm('service_pnzzwnz', 'template_8zsenzm', form.current, '4Ctb_sqQaySydPYc-')
-      .then((result) => {
-          console.log(result.text);
-      }, (error) => {
-          console.log(error.text);
-      });
+            let password = passwordGenerator();
 
-      toast.success("Check your mail");
+            let virtusaemail = firstname+middleName+lastname+"@virtusa.com";
+
+            axios.post(`http://localhost:8017/generatemail/${email}/${virtusaemail}/${password}`).then(
+              ()=>{
+                emailjs.sendForm('service_pnzzwnz', 'template_8zsenzm', form.current, '4Ctb_sqQaySydPYc-')
+                .then((result) => {
+                    console.log(result.text);
+                }, (error) => {
+                    console.log(error.text);
+                });
+          
+                toast.success("Check your mail");
+              }
+            ).catch(()=>{
+              toast.error("Sorry try again");
+            });
+
+            
+
+
+
+    
     }
       
   }
@@ -82,7 +146,7 @@ function Home() {
         <input type="text"   onChange={e=>{setLastName(e.target.value)}} class="form-control form-control-sm" placeholder='enter last name' name="last_name" />
         </div>
         </div><br></br>
-       
+          <input style={{display:"none"}} type="text" class="form-control form-control-sm" name="password"  id="password"></input>
         </form>
 
         <button  class="btn btn-primary "  onClick={sendEmail} >Submit</button>

@@ -1,13 +1,29 @@
 import React, { useState } from 'react';
 import * as FaIcons from "react-icons/fa"
 import * as AiIcons from "react-icons/ai"
-import {Link} from 'react-router-dom'
+import { Button } from 'react-bootstrap';
 import {Sidebardata} from './Sidebardata'
 import './Navbar.css'
 import {IconContext} from 'react-icons'
+import {Link,useNavigate} from 'react-router-dom'
+
+
+
+
+
 
 function Navbar()
 {
+
+    const navigate=useNavigate();
+
+    function logOut()
+    {
+    localStorage.removeItem('USER_KEY');
+    navigate("/");
+    }
+    
+
     const [Sidebar,setSidebar]=useState(false);
 
     const showSidebar =()=>{
@@ -18,11 +34,15 @@ function Navbar()
     return (
 
         <IconContext.Provider value={{color:'#fff'}}>
-   <div className='navbar'>
+   <div className='navbar' style={{display:"flex",justifyContent:"space-between"}}>
     
     <Link to='#' className='menu-bars'>
         <FaIcons.FaBars onClick={showSidebar}  />
     </Link>
+
+    <Button style={{marginRight:"5px"}}  onClick={logOut}  >
+        Logout
+    </Button>
 
     <nav className={Sidebar?'nav-menu active':'nav-menu'}>
 
